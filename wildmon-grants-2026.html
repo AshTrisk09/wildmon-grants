@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>WildMon — 2026 Grant Opportunity Analysis</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #ffffff;
+    --bg-secondary: #f5f5f3;
+    --bg-tertiary: #efefec;
+    --text: #1a1a18;
+    --text-secondary: #6b6b67;
+    --border: rgba(0,0,0,0.12);
+    --border-hover: rgba(0,0,0,0.22);
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --font: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #1c1c1a;
+      --bg-secondary: #252523;
+      --bg-tertiary: #2e2e2b;
+      --text: #f0ede8;
+      --text-secondary: #9a9892;
+      --border: rgba(255,255,255,0.1);
+      --border-hover: rgba(255,255,255,0.2);
+    }
+  }
+
+  body {
+    font-family: var(--font);
+    background: var(--bg-tertiary);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 2rem 1rem 4rem;
+  }
+
+  .container {
+    max-width: 820px;
+    margin: 0 auto;
+  }
+
+  .header {
+    margin-bottom: 2rem;
+  }
+
+  .header-top {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 6px;
+  }
+
+  .logo-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #1D9E75;
+    flex-shrink: 0;
+  }
+
+  .header h1 {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--text);
+    letter-spacing: -0.3px;
+  }
+
+  .header p {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-left: 22px;
+  }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 1.25rem;
+  }
+
+  @media (max-width: 500px) {
+    .stats { grid-template-columns: repeat(2, 1fr); }
+  }
+
+  .stat {
+    background: var(--bg);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: 14px 16px;
+  }
+
+  .stat-n {
+    font-size: 24px;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+  }
+
+  .stat-l {
+    font-size: 11px;
+    color: var(--text-secondary);
+    margin-top: 2px;
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+
+  .filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 1.25rem;
+  }
+
+  .filter-btn {
+    font-size: 12px;
+    padding: 5px 13px;
+    border-radius: 99px;
+    border: 0.5px solid var(--border);
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    font-family: var(--font);
+    transition: all 0.15s;
+  }
+
+  .filter-btn:hover { background: var(--bg-secondary); }
+  .filter-btn.active-all { border-color: var(--border-hover); color: var(--text); background: var(--bg-secondary); }
+  .filter-btn.active-open { border-color: transparent; color: #085041; background: #E1F5EE; }
+  .filter-btn.active-amber { border-color: transparent; color: #633806; background: #FAEEDA; }
+  .filter-btn.active-closed { border-color: transparent; color: #791F1F; background: #FCEBEB; }
+  .filter-btn.active-purple { border-color: transparent; color: #3C3489; background: #EEEDFE; }
+
+  @media (prefers-color-scheme: dark) {
+    .filter-btn.active-open { color: #5DCAA5; background: rgba(93,202,165,0.15); }
+    .filter-btn.active-amber { color: #EF9F27; background: rgba(239,159,39,0.15); }
+    .filter-btn.active-closed { color: #F09595; background: rgba(240,149,149,0.15); }
+    .filter-btn.active-purple { color: #AFA9EC; background: rgba(175,169,236,0.15); }
+  }
+
+  .grants { display: flex; flex-direction: column; gap: 8px; }
+
+  .grant-card {
+    background: var(--bg);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 16px 18px;
+    cursor: pointer;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    user-select: none;
+  }
+
+  .grant-card:hover { border-color: var(--border-hover); }
+  .grant-card.is-open { border-color: var(--border-hover); }
+
+  .grant-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .grant-info { flex: 1; min-width: 0; }
+
+  .grant-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    margin-bottom: 6px;
+    line-height: 1.4;
+  }
+
+  .grant-meta { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+
+  .badge {
+    font-size: 11px;
+    padding: 3px 9px;
+    border-radius: 99px;
+    display: inline-flex;
+    align-items: center;
+    font-weight: 500;
+    white-space: nowrap;
+  }
+
+  .badge-green { background: #E1F5EE; color: #085041; }
+  .badge-amber { background: #FAEEDA; color: #633806; }
+  .badge-red { background: #FCEBEB; color: #791F1F; }
+  .badge-purple { background: #EEEDFE; color: #3C3489; }
+  .badge-gray { background: var(--bg-secondary); color: var(--text-secondary); }
+
+  @media (prefers-color-scheme: dark) {
+    .badge-green { background: rgba(93,202,165,0.18); color: #5DCAA5; }
+    .badge-amber { background: rgba(239,159,39,0.18); color: #EF9F27; }
+    .badge-red { background: rgba(240,149,149,0.18); color: #F09595; }
+    .badge-purple { background: rgba(175,169,236,0.18); color: #AFA9EC; }
+  }
+
+  .relevance-dots {
+    display: flex;
+    gap: 3px;
+    align-items: center;
+    margin-left: auto;
+    flex-shrink: 0;
+    padding-top: 2px;
+  }
+
+  .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .dot-fill { background: #1D9E75; }
+  .dot-empty { background: var(--border); }
+
+  .grant-detail {
+    display: none;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 0.5px solid var(--border);
+  }
+
+  .grant-detail.open { display: block; }
+
+  .detail-section { margin-bottom: 10px; }
+
+  .detail-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-secondary);
+    margin-bottom: 3px;
+    font-weight: 500;
+  }
+
+  .detail-text {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.65;
+  }
+
+  .detail-text.highlighted {
+    color: var(--text);
+    background: var(--bg-secondary);
+    padding: 10px 12px;
+    border-radius: var(--radius-md);
+    border-left: 2px solid #1D9E75;
+  }
+
+  .detail-deadline {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    background: var(--bg-secondary);
+    padding: 6px 12px;
+    border-radius: var(--radius-md);
+    margin-top: 4px;
+  }
+
+  .chevron {
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    color: var(--text-secondary);
+    transition: transform 0.2s;
+    margin-top: 2px;
+  }
+
+  .is-open .chevron { transform: rotate(180deg); }
+
+  .empty {
+    text-align: center;
+    padding: 3rem;
+    color: var(--text-secondary);
+    font-size: 14px;
+    background: var(--bg);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius-lg);
+  }
+
+  .footer {
+    margin-top: 2.5rem;
+    font-size: 12px;
+    color: var(--text-secondary);
+    text-align: center;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <div class="header-top">
+      <div class="logo-dot"></div>
+      <h1>WildMon — 2026 Grant Opportunity Analysis</h1>
+    </div>
+    <p>28 grants evaluated for relevance, status, and fit to WildMon's AI-powered biodiversity monitoring work</p>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="stat-n" id="s-apply" style="color:#1D9E75"></div><div class="stat-l">Apply now</div></div>
+    <div class="stat"><div class="stat-n" id="s-upcoming" style="color:#BA7517"></div><div class="stat-l">Upcoming</div></div>
+    <div class="stat"><div class="stat-n" id="s-closed" style="color:#A32D2D"></div><div class="stat-l">Closed 2026</div></div>
+    <div class="stat"><div class="stat-n" id="s-check" style="color:#534AB7"></div><div class="stat-l">Needs verification</div></div>
+  </div>
+
+  <div class="filters">
+    <button class="filter-btn active-all" data-filter="all">All grants</button>
+    <button class="filter-btn active-open" data-filter="open">Apply now</button>
+    <button class="filter-btn active-amber" data-filter="upcoming">Upcoming</button>
+    <button class="filter-btn active-closed" data-filter="closed">Closed</button>
+    <button class="filter-btn active-purple" data-filter="check">Needs verification</button>
+  </div>
+
+  <div class="grants" id="grant-list"></div>
+
+  <div class="footer">Generated for WildMon · April 2026 · Click any card to expand full fit assessment</div>
+</div>
+
+<script>
+const grants = [
+  {
+    name: "NSF — Advancing Research at Biology & AI Intersection",
+    status: "open", statusLabel: "Open — rolling",
+    relevance: 5,
+    funding: "Varies — subject to availability",
+    deadline: "Rolling — next major target: Sep 10, 2026",
+    overview: "NSF's Directorate for Biological Sciences encourages proposals that advance biological research using AI/ML. Open to all NSF-eligible organizations. Focuses on large biological dataset analysis and predictive modelling.",
+    fit: "A direct institutional fit. WildMon's core work — using ML to analyze ecoacoustic, camera trap, and eDNA data — is exactly what NSF's BIO Directorate is funding. WildMon would need a US academic partner to lead the proposal, with WildMon as a named collaborator. Next target date: September 10, 2026."
+  },
+  {
+    name: "National Geographic Society Exploration Grants",
+    status: "open", statusLabel: "Open — rolling cycles",
+    relevance: 4,
+    funding: "Level 1: up to $20K / Level 2: up to $100K",
+    deadline: "Rolling — check nationalgeographic.org for next RFP",
+    overview: "Individual-led grant program for bold, innovative projects in science, conservation, and technology. Level 1 for emerging practitioners; Level 2 for established leaders. Wildlife is a dedicated focus area.",
+    fit: "NatGeo funds science, conservation, and technology projects globally. WildMon's field work across 14 countries combined with AI tools is exactly the kind of bold, global work NatGeo supports. Team members can apply as individuals — the Wildlife focus area is a natural match."
+  },
+  {
+    name: "Biodiversa+ — BiodivConnect Joint Call",
+    status: "open", statusLabel: "Full proposals due Apr 14, 2026",
+    relevance: 4,
+    funding: "40M€ pool across transnational consortia",
+    deadline: "Full proposals: April 14, 2026, 12:00 CEST",
+    overview: "5th Biodiversa+ joint call focused on nature restoration and biodiversity monitoring. Must submit as a multi-country research consortium. Co-funded by the European Commission and 41 national funding organizations.",
+    fit: "Strong thematic alignment — nature restoration research with biodiversity monitoring. WildMon would need to join a transnational European research consortium as a technology partner. If a European partner exists in WildMon's network, this is worth pursuing urgently. BiodivFuture next call expected September 2026."
+  },
+  {
+    name: "Re:wild — Fonseca Species Conservation Fund",
+    status: "open", statusLabel: "Ongoing — verify current window",
+    relevance: 4,
+    funding: "Up to $25,000",
+    deadline: "Check rewild.org — projects must end by Sep 30, 2026",
+    overview: "Established by Re:wild and the Global Environment Facility (GEF). Covers five threatened species groups: amphibians, freshwater fish, primates, small mammals, tortoises and freshwater turtles. Primarily field-based projects required.",
+    fit: "WildMon's field-based monitoring in multiple countries aligns well with the Fonseca Fund's priorities. Small grants, but the Re:wild brand and network add significant value beyond the funding itself. Verify the current application window directly."
+  },
+  {
+    name: "The Bright Initiative (Bright Data)",
+    status: "open", statusLabel: "Open — ongoing pro-bono",
+    relevance: 3,
+    funding: "Non-cash: free access to web data infrastructure",
+    deadline: "Rolling applications — brightinitiative.com",
+    overview: "Bright Data's pro-bono initiative providing nonprofits and academic institutions free access to their web data platform. Covers Environment & Sustainability among other focus areas.",
+    fit: "Not a cash grant, but could support open data aggregation, species database access, or policy monitoring workflows. Useful as a supplementary operational tool rather than core project funding. Low barrier to apply."
+  },
+  {
+    name: "Biodiversa+ — BiodivFuture Call (Upcoming)",
+    status: "upcoming", statusLabel: "Launching Sep 2026",
+    relevance: 4,
+    funding: "Multi-million € transnational projects",
+    deadline: "Pre-announcement: June 2026 / Launch: Sep 2026 / Deadline: Nov 2026",
+    overview: "Biodiversa+'s next joint call after BiodivConnect. Transversal to flagship programmes on biodiversity protection across land and sea, and societal transformation for sustainable biodiversity management.",
+    fit: "Begin building European research consortium now. WildMon's monitoring tools and field expertise across 14 countries would be a valuable partner for any European research team. Target BioMonWeek 2026 in Montpellier (May 2026) to make these connections."
+  },
+  {
+    name: "Google.org Impact Challenge: AI for Science",
+    status: "closed", statusLabel: "Just closed — Apr 17, 2026",
+    relevance: 5,
+    funding: "$500K–$3M USD",
+    deadline: "April 17, 2026 (CLOSED) — watch for 2027 cycle",
+    overview: "A $30M global open call. Funded nonprofits, academic institutions, and social enterprises using AI for climate resilience, environmental science, and life sciences. Selected organizations also join a 6-month Google.org Accelerator.",
+    fit: "This was a near-perfect fit. The challenge explicitly listed biodiversity modelling, climate resilience, and AI for environmental science. WildMon's integrated AI stack for ecoacoustics, camera traps, and eDNA maps directly to stated priorities. Flag this hard for the 2027 cycle."
+  },
+  {
+    name: "WILDLABS Awards 2026 (Wild Tech Alliance)",
+    status: "closed", statusLabel: "EOI closed Mar 18, 2026",
+    relevance: 5,
+    funding: "$10,000–$50,000 per project (15 projects, $350K pool)",
+    deadline: "Expression of Interest: March 18, 2026 (CLOSED) — prepare for 2027",
+    overview: "WILDLABS Awards supported by Arm. 15 projects receive $10K or $50K grants plus engineering support. Covers biodiversity monitoring, species protection, AI analytics, remote sensing, and field-based sensor systems.",
+    fit: "Strongest possible organizational fit — WILDLABS is WildMon's own community platform and this award directly targets AI, bioacoustics, and camera trap conservation technology. WildMon must prioritize this for 2027. Begin relationship-building with the WILDLABS team immediately."
+  },
+  {
+    name: "Earthshot Prize",
+    status: "closed", statusLabel: "Nominations closed Nov 2025",
+    relevance: 5,
+    funding: "£1M per winner (5 winners annually)",
+    deadline: "Nominations for 2026 closed Oct–Nov 2025 — target 2027",
+    overview: "Prince William's global environmental prize. 5 winners receive £1M each. 15 finalists receive a year of tailored support. Five categories: Protect & Restore Nature, Clean our Air, Revive our Oceans, Build a Waste-Free World, Fix our Climate.",
+    fit: "Exceptional fit under 'Protecting and Restoring Nature.' WildMon's multi-country, AI-powered monitoring infrastructure is exactly the scalable solution Earthshot seeks. Nominations require official nominators. Target 2027 cycle — begin engaging official nominators now."
+  },
+  {
+    name: "Whitley Fund for Nature",
+    status: "closed", statusLabel: "Closed — deadline was Oct 31, 2025",
+    relevance: 3,
+    funding: "£50,000 over one year",
+    deadline: "2027 applications open July/August 2026",
+    overview: "Called the 'Green Oscars.' Awards go to mid-career conservationists leading wildlife projects in the Global South. Winners must be nationals of the country where they work. Community-based projects with science foundations are prioritised.",
+    fit: "Good structural fit — community-based conservation in the Global South. However, awards go to individuals (not organizations) and applicants must be nationals of their working country. WildMon team members in eligible countries could apply individually for the 2027 cycle."
+  },
+  {
+    name: "EOCA Conservation Fund",
+    status: "closed", statusLabel: "Closed — deadline was Mar 31, 2026",
+    relevance: 3,
+    funding: "Up to €30,000",
+    deadline: "March 31, 2026 (CLOSED) — next cycle TBC",
+    overview: "European Outdoor Conservation Association funds conservation projects through its outdoor industry member network. A member company vote determines project shortlisting. Annual granting schedule.",
+    fit: "Good fit for field-based conservation work with outdoor industry backing. WildMon's community deployments align with EOCA's priorities. Watch for next cycle announcement in late 2026."
+  },
+  {
+    name: "VF Foundation Phase 3 — Thailand (The North Face)",
+    status: "check", statusLabel: "Existing relationship — verify status",
+    relevance: 5,
+    funding: "Unspecified (project-based)",
+    deadline: "Internal — contact VF Foundation directly",
+    overview: "WildMon is already actively partnered with VF Foundation and The North Face on the Southern Thailand ecoacoustic project monitoring regenerative rubber agroforestry vs conventional farming using passive acoustics.",
+    fit: "Warm existing relationship — this is a priority conversation, not a cold application. Phase 3 continuation funding should be discussed directly with the VF Foundation contact. The strongest near-term funding opportunity."
+  },
+  {
+    name: "Allen Institute for AI (Ai2) — Conservation Tech Award",
+    status: "check", statusLabel: "Paused 2025 — verify 2026 status",
+    relevance: 5,
+    funding: "2x $15,000 (Adopter + Practitioner grants)",
+    deadline: "Paused in 2025 — monitor earthranger.com for reopening",
+    overview: "Ai2's EarthRanger Conservation Tech Award ran annually 2021–2024 (paused in 2025). Two grant types: Technology Adopter (deployed tech in novel ways) and Technology Practitioner (developed AI/software for conservation). All organizations eligible, not just EarthRanger users.",
+    fit: "Near-perfect institutional fit. WildMon qualifies strongly for the Technology Practitioner Grant — developing AI models and software for ecoacoustic and camera trap analysis. Monitor earthranger.com actively and apply immediately if the 2026 cycle opens."
+  },
+  {
+    name: "Eric & Wendy Schmidt Fund for Strategic Innovation",
+    status: "check", statusLabel: "Active RFPs — verify fit",
+    relevance: 3,
+    funding: "Tier 1: up to $1M / Tier 2: $1M–$5M+",
+    deadline: "Science of Trustworthy AI: May 17, 2026",
+    overview: "Schmidt Sciences publishes competitive RFPs. Current open calls: AI for Actionable Matter Modeling, Unconventional Compute, Science of Trustworthy AI, and Humanities & AI Virtual Institute (HAVI). Requires institutional affiliation.",
+    fit: "Primarily funds physical sciences and AI safety — less direct conservation fit. However, framing WildMon's work around foundational AI models for ecological data analysis could open a pathway. Requires established academic institutional partner to apply."
+  },
+  {
+    name: "The Audacious Project (TED)",
+    status: "check", statusLabel: "Invitation-only — relationship required",
+    relevance: 4,
+    funding: "Multi-million USD (transformational scale)",
+    deadline: "Invitation-based — not an open call",
+    overview: "A joint funder initiative housed at TED. Funds ideas with potential for transformative global impact. Past grantees include ocean conservation, wildlife tech, and systems-change organizations. Entry is by invitation through TED's network.",
+    fit: "WildMon's vision of globally accessible biodiversity monitoring infrastructure is exactly the kind of bold, planet-scale idea Audacious funds. Target: build relationships with TED Fellows and speakers in conservation tech who can nominate WildMon for a future cycle."
+  },
+  {
+    name: "Amazon IA (AWS or Amazon Conservation)",
+    status: "check", statusLabel: "Clarify which program",
+    relevance: 3,
+    funding: "AWS credits: up to $100K+ / Conservation: project-based",
+    deadline: "AWS: rolling / Amazon Conservation: verify",
+    overview: "Two likely interpretations: (1) AWS Open Data / Research Credits program for nonprofits — cloud computing grants for AI/ML workloads; (2) Amazon Conservation Association focused on Amazon basin conservation projects.",
+    fit: "If AWS — WildMon could apply for cloud credits to power AI analyses of ecoacoustic and camera trap data. This would reduce operational costs significantly. Clarify which program was intended to pursue the right route."
+  },
+  {
+    name: "Huawei — Tech4All",
+    status: "check", statusLabel: "Verify 2026 open call",
+    relevance: 3,
+    funding: "Project-based (varies by initiative)",
+    deadline: "Check tech4all.huawei.com for 2026 cycle",
+    overview: "Huawei's digital inclusion and sustainability initiative. Has supported nature conservation and biodiversity projects using AI and digital monitoring tools. Open call schedules vary by region.",
+    fit: "The AI for sustainability angle aligns with WildMon's work. Geopolitical considerations may affect eligibility depending on WildMon's country of registration. Worth investigating once the 2026 call schedule is confirmed."
+  },
+  {
+    name: "Daimler und Benz Stiftung",
+    status: "check", statusLabel: "Verify open call schedule",
+    relevance: 3,
+    funding: "Research project grants (varies)",
+    deadline: "Check daimler-benz-stiftung.de for 2026 cycle",
+    overview: "German private foundation funding interdisciplinary research bridging technology, science, and society. Has funded biodiversity and ecological research projects with a technology component.",
+    fit: "WildMon's scientific credibility and AI-tech approach could qualify. Grants typically favor German or European researchers — an institutional partnership with a German university would strengthen eligibility significantly."
+  },
+  {
+    name: "Salesforce Foundation",
+    status: "check", statusLabel: "Verify current environmental focus",
+    relevance: 2,
+    funding: "Varies — project and general operating support",
+    deadline: "Quarterly letter of inquiry review",
+    overview: "Current priorities: STEM and AI access, education, workforce development, and housing. Environmental conservation appears de-prioritized as of 2025. Quarterly LOI process.",
+    fit: "Conservation fit is weakening but the technology + AI angle could still resonate if framed around AI for environmental monitoring. Submit an LOI to gauge response. All nonprofits also get free Salesforce licenses through the Power of Us program regardless."
+  },
+  {
+    name: "Hempel Foundation",
+    status: "check", statusLabel: "Verify ocean/marine focus",
+    relevance: 2,
+    funding: "Project-based (varies)",
+    deadline: "Check hempelfoundation.org for 2026 cycle",
+    overview: "Danish foundation linked to Hempel coatings. Focuses primarily on ocean health and marine conservation with growing emphasis on technology-based monitoring solutions.",
+    fit: "WildMon's current work is predominantly terrestrial and freshwater. A marine eDNA or passive acoustic ocean monitoring angle could open a pathway. Otherwise limited fit with current programme."
+  },
+  {
+    name: "Bezos Earth Fund + Audubon",
+    status: "check", statusLabel: "Clarify specific program",
+    relevance: 3,
+    funding: "Bezos Earth Fund: $1M+ / Audubon: varies",
+    deadline: "Bezos Earth Fund: primarily invitation-based",
+    overview: "The Bezos Earth Fund ($10B total commitment) funds large conservation and climate organizations — primarily invitation-based. National Audubon Society has separate grant programs focused on bird conservation.",
+    fit: "Clarify whether 'BEZOS Audubon Bye' refers to a specific Audubon grant program or a Bezos-Audubon joint initiative. WildMon's bioacoustics work (bird species detection from audio) is a strong fit for Audubon specifically. Pursue that angle."
+  },
+  {
+    name: "L'Oréal & Cambridge ISL — Sustainable Innovation Accelerator",
+    status: "check", statusLabel: "Verify 2026 cohort open",
+    relevance: 2,
+    funding: "Accelerator support + potential grant (varies)",
+    deadline: "Check cisl.cam.ac.uk for 2026 cohort dates",
+    overview: "Partnership between L'Oréal and Cambridge Institute for Sustainability Leadership. Annual cohort program targeting business innovations driving environmental sustainability — mentorship, network access, and potential grant funding.",
+    fit: "Primarily targets businesses with sustainable product/service innovations. WildMon's SaaS biodiversity monitoring platform could qualify. Worth investigating if WildMon wants accelerator-style business support alongside project funding."
+  },
+  {
+    name: "New Venture Fund",
+    status: "check", statusLabel: "Fiscal sponsor — not a direct funder",
+    relevance: 2,
+    funding: "Pass-through vehicle — varies by project",
+    deadline: "Depends on specific donor or project",
+    overview: "One of the largest fiscal sponsorship organizations in US philanthropy. Manages grants and projects for progressive foundations. Not an open-call grant program — access requires an existing donor using NVF as their vehicle.",
+    fit: "Not applicable as a direct grant application. If WildMon has a specific donor or funder who uses NVF infrastructure, this becomes relevant. Otherwise, clarify what specific funding stream was intended."
+  },
+  {
+    name: "National Philanthropic Trust (NPT)",
+    status: "check", statusLabel: "DAF vehicle — requires donor referral",
+    relevance: 2,
+    funding: "Varies by individual donor-advised fund",
+    deadline: "N/A — requires donor relationship",
+    overview: "NPT manages donor-advised funds for high-net-worth individuals. One of the largest DAF sponsors in the US with over $50B in assets. Organizations cannot apply directly.",
+    fit: "WildMon's path here is through donor cultivation. Identify current or prospective donors who hold DAF accounts at NPT and encourage them to recommend WildMon for a grant distribution. Not an application route."
+  },
+  {
+    name: "Sonos Sound Forward Fund",
+    status: "check", statusLabel: "Verify conservation alignment",
+    relevance: 2,
+    funding: "Varies by program",
+    deadline: "Check sonos.com/foundation",
+    overview: "Sonos philanthropy primarily supports music education and access to audio experiences. No confirmed conservation tech focus.",
+    fit: "WildMon's bioacoustics work (using sound to monitor wildlife) is an interesting narrative hook but a genuine stretch as a funding rationale. Quick verify to rule in or out — likely not worth significant pursuit."
+  },
+  {
+    name: "Flourishing in Community",
+    status: "check", statusLabel: "Needs clarification",
+    relevance: 2,
+    funding: "Varies",
+    deadline: "Verify source",
+    overview: "Could not confirm this as a distinct, publicly-listed grant program. May be a Templeton Foundation sub-program or a newer initiative not yet indexed publicly.",
+    fit: "Needs clarification on the full program name, funder, and focus area before assessing fit for WildMon. Recommend verifying the source contact who shared this opportunity."
+  },
+  {
+    name: "Pay it Forward Foundation",
+    status: "check", statusLabel: "Needs clarification",
+    relevance: 2,
+    funding: "Varies",
+    deadline: "Verify source",
+    overview: "Multiple organizations use the 'Pay it Forward' name across different countries and sectors. Could not confirm a specific conservation-relevant grant program.",
+    fit: "Recommend clarifying which specific foundation or program this refers to — country of origin and focus area would help narrow this down significantly."
+  },
+  {
+    name: "Dory Foundation",
+    status: "check", statusLabel: "Needs clarification",
+    relevance: 2,
+    funding: "Varies",
+    deadline: "Verify source",
+    overview: "Could not find a public-facing grant program under this name relevant to conservation technology.",
+    fit: "Needs source clarification. May be a private family foundation. Recommend verifying the full name, geographic focus, and a contact within the funder's network."
+  },
+  {
+    name: "Ikki Grants",
+    status: "check", statusLabel: "Needs clarification",
+    relevance: 2,
+    funding: "Varies",
+    deadline: "Verify source",
+    overview: "Could not identify a conservation or technology grant program under this name. May be a regional initiative.",
+    fit: "Recommend clarifying the funder and focus area. If this is a Japanese or Asian philanthropic initiative, WildMon's Asia-Pacific field work could create a pathway."
+  }
+];
+
+const statusBadge = { open: 'badge-green', upcoming: 'badge-amber', closed: 'badge-red', check: 'badge-purple' };
+const filterState = { open: true, upcoming: true, closed: true, check: true };
+let openCard = null;
+
+function dots(n) {
+  let s = '';
+  for (let i = 0; i < 5; i++) s += `<div class="dot ${i < n ? 'dot-fill' : 'dot-empty'}"></div>`;
+  return `<div class="relevance-dots">${s}</div>`;
+}
+
+function chevronSVG() {
+  return `<svg class="chevron" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M4 6L8 10L12 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>`;
+}
+
+function render() {
+  const list = document.getElementById('grant-list');
+  const visible = grants.filter(g => filterState[g.status]);
+  if (!visible.length) {
+    list.innerHTML = '<div class="empty">No grants match the selected filters.</div>';
+    return;
+  }
+  list.innerHTML = visible.map(g => {
+    const idx = grants.indexOf(g);
+    const isOpen = openCard === idx;
+    return `<div class="grant-card${isOpen ? ' is-open' : ''}" onclick="toggle(${idx})">
+      <div class="grant-header">
+        <div class="grant-info">
+          <div class="grant-name">${g.name}</div>
+          <div class="grant-meta">
+            <span class="badge ${statusBadge[g.status]}">${g.statusLabel}</span>
+            <span class="badge badge-gray">${g.funding}</span>
+          </div>
+        </div>
+        ${dots(g.relevance)}
+        ${chevronSVG()}
+      </div>
+      <div class="grant-detail${isOpen ? ' open' : ''}">
+        <div class="detail-section">
+          <div class="detail-label">About this grant</div>
+          <div class="detail-text">${g.overview}</div>
+        </div>
+        <div class="detail-section">
+          <div class="detail-label">WildMon fit</div>
+          <div class="detail-text highlighted">${g.fit}</div>
+        </div>
+        <div class="detail-section">
+          <div class="detail-label">Deadline</div>
+          <div class="detail-deadline">${g.deadline}</div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+  updateStats();
+}
+
+function toggle(i) {
+  openCard = openCard === i ? null : i;
+  render();
+}
+
+function updateStats() {
+  document.getElementById('s-apply').textContent = grants.filter(g => g.status === 'open').length;
+  document.getElementById('s-upcoming').textContent = grants.filter(g => g.status === 'upcoming').length;
+  document.getElementById('s-closed').textContent = grants.filter(g => g.status === 'closed').length;
+  document.getElementById('s-check').textContent = grants.filter(g => g.status === 'check').length;
+}
+
+document.querySelectorAll('.filter-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const f = btn.dataset.filter;
+    if (f === 'all') {
+      const allOn = Object.values(filterState).every(v => v);
+      Object.keys(filterState).forEach(k => filterState[k] = !allOn);
+      btn.classList.toggle('active-all', !allOn);
+    } else {
+      filterState[f] = !filterState[f];
+      const activeClass = { open: 'active-open', upcoming: 'active-amber', closed: 'active-closed', check: 'active-purple' }[f];
+      btn.classList.toggle(activeClass, filterState[f]);
+      const allActive = Object.values(filterState).every(v => v);
+      document.querySelector('[data-filter="all"]').classList.toggle('active-all', allActive);
+    }
+    render();
+  });
+});
+
+render();
+</script>
+</body>
+</html>
